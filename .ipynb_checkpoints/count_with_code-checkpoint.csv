@@ -1,0 +1,51 @@
+,state_short,state_name,state_code,count
+0,AK,Alaska,2,16
+1,AL,Alabama,1,6
+2,AR,Arkansas,5,102
+3,AZ,Arizona,4,330
+4,CA,California,6,1201
+5,CO,Colorado,8,148
+6,CT,Connecticut,9,53
+7,DE,Delaware,10,44
+8,FL,Florida,12,621
+9,GA,Georgia,13,420
+10,HI,Hawaii,15,32
+11,IA,Iowa,19,115
+12,ID,Idaho,16,51
+13,IL,Illinois,17,405
+14,IN,Indiana,18,254
+15,KS,Kansas,20,74
+16,KY,Kentucky,21,166
+17,LA,Louisiana,22,202
+18,MA,Massachusetts,25,205
+19,MD,Maryland,24,172
+20,ME,Maine,23,25
+21,MI,Michigan,26,374
+22,MN,Minnesota,27,199
+23,MO,Missouri,29,163
+24,MS,Mississippi,28,55
+25,MT,Montana,30,38
+26,NC,North Carolina,37,295
+27,ND,North Dakota,38,35
+28,NE,Nebraska,31,87
+29,NH,New Hampshire,33,34
+30,NJ,New Jersey,34,129
+31,NM,New Mexico,35,78
+32,NV,Nevada,32,121
+33,NY,New York,36,352
+34,OH,Ohio,39,522
+35,OK,Oklahoma,40,166
+36,OR,Oregon,41,154
+37,PA,Pennsylvania,42,383
+38,RI,Rhode Island,44,15
+39,SC,South Carolina,45,188
+40,SD,South Dakota,46,42
+41,TN,Tennessee,47,302
+42,TX,Texas,48,811
+43,UT,Utah,49,63
+44,VA,Virginia,51,253
+45,VT,Vermont,50,15
+46,WA,Washington,53,196
+47,WI,Wisconsin,55,189
+48,WV,West Virginia,54,70
+49,WY,Wyoming,56,29

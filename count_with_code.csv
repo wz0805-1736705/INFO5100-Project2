@@ -1,0 +1,51 @@
+state_short,state_name,state_code,count
+AK,Alaska,2,16
+AL,Alabama,1,6
+AR,Arkansas,5,102
+AZ,Arizona,4,330
+CA,California,6,1201
+CO,Colorado,8,148
+CT,Connecticut,9,53
+DE,Delaware,10,44
+FL,Florida,12,621
+GA,Georgia,13,420
+HI,Hawaii,15,32
+IA,Iowa,19,115
+ID,Idaho,16,51
+IL,Illinois,17,405
+IN,Indiana,18,254
+KS,Kansas,20,74
+KY,Kentucky,21,166
+LA,Louisiana,22,202
+MA,Massachusetts,25,205
+MD,Maryland,24,172
+ME,Maine,23,25
+MI,Michigan,26,374
+MN,Minnesota,27,199
+MO,Missouri,29,163
+MS,Mississippi,28,55
+MT,Montana,30,38
+NC,North Carolina,37,295
+ND,North Dakota,38,35
+NE,Nebraska,31,87
+NH,New Hampshire,33,34
+NJ,New Jersey,34,129
+NM,New Mexico,35,78
+NV,Nevada,32,121
+NY,New York,36,352
+OH,Ohio,39,522
+OK,Oklahoma,40,166
+OR,Oregon,41,154
+PA,Pennsylvania,42,383
+RI,Rhode Island,44,15
+SC,South Carolina,45,188
+SD,South Dakota,46,42
+TN,Tennessee,47,302
+TX,Texas,48,811
+UT,Utah,49,63
+VA,Virginia,51,253
+VT,Vermont,50,15
+WA,Washington,53,196
+WI,Wisconsin,55,189
+WV,West Virginia,54,70
+WY,Wyoming,56,29

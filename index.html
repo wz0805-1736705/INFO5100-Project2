@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <style>
+  
+        .state {
+          fill: lightgrey;
+        }
+        .outline {
+          stroke: lightgray;
+          stroke-width: 0.9px;
+          fill: none;
+        }
+      
+    </style>
+</head>
+<body>
+    <h1>Project 2</h1>
+    <h2>Team Member: Zhan Wu, Yingshi Zhu, Qi Su, Minwei Jiang</h2>
+    <p class="p1">
+    <div id="graph">
+        <svg id="map" height="500" width="700" style="margin: 20px"></svg>
+    </div>
+    <div id="plot">
+    </div>
+    <script>
+
+        // select map svg and do normal operations
+        const mapSvg = d3.select("#map");
+        const width = mapSvg.attr("width");
+        const height = mapSvg.attr("height");
+        const margin = {top: 20, right: 20, bottom: 20, left: 20};
+        const mapWidth = width - margin.left - margin.right;
+        const mapHeight = height - margin.top - margin.bottom;
+        const map = mapSvg.append('g')
+                        .attr("transform", "translate("+margin.left+","+margin.top+")");
+        
+        const requestFastFoodData = async function() {
+
+            // load fast food restaurant data
+            const fastFoodData = await d3.csv("./count_with_code.csv");
+            const requestData = async function() {
+
+                // load map data
+                const usMapData = await d3.json("./us-smaller.json");
+                console.log(usMapData);
+            
+                // Pick out topographic features and build d3 helpers
+                var states = topojson.feature(usMapData, usMapData.objects.states);     // List of state outlines to fill
+                var statesMesh = topojson.mesh(usMapData, usMapData.objects.states);    // 'Mesh' of all outlines put together for a stroke
+                var projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
+                var path = d3.geoPath().projection(projection);
+                
+                // create array to store number of fast food restaurants in each state for colorScale
+                var countArr = [];
+                let max = 0;
+                // assign number of fast food restaurants to state feature property
+                for (let i = 0; i < states.features.length; i++) {
+                    let state = states.features[i];
+                    for (let j = 0; j <= 49; j++) {
+                        let element = fastFoodData[j];
+                        if (state.id == element['state_code']) {
+                            states.features[i].properties.numberOfRestaurant = parseInt(element['count']);
+                            countArr.push(parseInt(element['count']));
+                            if (parseInt(element['count']) > max) {
+                                max = parseInt(element['count']);
+                            }
+                            break;
+                        }
+                    }
+                }
+                    
+                // create color scale
+                var colorArr = ["#f4f4f4", "#fcd6d6", "#f9aeae", "#f68585", "#f35c5c", "#f03333", "#e71111", "#be0e0e", "#950b0b", "#6d0808"];
+                var colorScale = d3.scaleQuantile().domain(countArr).range(colorArr);
+
+                // draw states and fill color by using color scale
+                map.selectAll("path.state").data(states.features)
+                .join("path")
+                .attr("class", "state")
+                .attr("d", path)
+                .style("stroke", "#fff")
+                .style("stroke-width", "1")
+                .style("fill", d => colorScale(d.properties.numberOfRestaurant))
+                .on("click", mouseClickEvent); // give each polygon a click-on event to open or close plots on the right side
+                
+                // draw borders of each state
+                map.append("path").datum(statesMesh)
+                .attr("class","outline")
+                .attr("d", path);
+                
+                function mouseClickEvent() {
+                    // if plots are shown, call closePlot
+
+                    // otherwise, set plot visibility to visible
+                }
+
+                function closePlot() {
+                    // set plot visibility to hidden
+                }
+                
+            }
+            requestData();
+
+        }
+        requestFastFoodData();
+
+        
+        
+    </script>
+    </p>
+</body>
+</html>
