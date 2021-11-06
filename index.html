@@ -21,9 +21,13 @@
     <h1>Project 2</h1>
     <h2>Team Member: Zhan Wu, Yingshi Zhu, Qi Su, Minwei Jiang</h2>
     <p class="p1">
+
+    <!-- div for map -->
     <div id="graph">
         <svg id="map" height="500" width="700" style="margin: 20px"></svg>
     </div>
+
+    <!-- div for plots -->
     <div id="plot">
     </div>
     <script>
@@ -41,11 +45,11 @@
         const requestFastFoodData = async function() {
 
             // load fast food restaurant data
-            const fastFoodData = await d3.csv("./count_with_code.csv");
+            const fastFoodData = await d3.csv("./data/count_with_code.csv");
             const requestData = async function() {
 
                 // load map data
-                const usMapData = await d3.json("./us-smaller.json");
+                const usMapData = await d3.json("./data/us-smaller.json");
                 console.log(usMapData);
             
                 // Pick out topographic features and build d3 helpers
@@ -92,6 +96,8 @@
                 .attr("class","outline")
                 .attr("d", path);
                 
+                // on click event
+                // can refer to 10/13 class note
                 function mouseClickEvent() {
                     // if plots are shown, call closePlot
 
