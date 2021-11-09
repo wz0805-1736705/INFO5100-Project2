@@ -1,122 +1,325 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://d3js.org/topojson.v3.min.js"></script>
-    <style>
-  
-        .state {
-          fill: lightgrey;
-        }
-        .outline {
-          stroke: lightgray;
-          stroke-width: 0.9px;
-          fill: none;
-        }
-      
-    </style>
-</head>
-<body>
-    <h1>Project 2</h1>
-    <h2>Team Member: Zhan Wu, Yingshi Zhu, Qi Su, Minwei Jiang</h2>
-    <p class="p1">
-
-    <!-- div for map -->
-    <div id="graph">
-        <svg id="map" height="500" width="700" style="margin: 20px"></svg>
-    </div>
-
-    <!-- div for plots -->
-    <div id="plot">
-    </div>
-    <script>
-
-        // select map svg and do normal operations
-        const mapSvg = d3.select("#map");
-        const width = mapSvg.attr("width");
-        const height = mapSvg.attr("height");
-        const margin = {top: 20, right: 20, bottom: 20, left: 20};
-        const mapWidth = width - margin.left - margin.right;
-        const mapHeight = height - margin.top - margin.bottom;
-        const map = mapSvg.append('g')
-                        .attr("transform", "translate("+margin.left+","+margin.top+")");
-        
-        const requestFastFoodData = async function() {
-
-            // load fast food restaurant data
-            const fastFoodData = await d3.csv("./data/count_with_code.csv");
-            const requestData = async function() {
-
-                // load map data
-                const usMapData = await d3.json("./data/us-smaller.json");
-                console.log(usMapData);
-            
-                // Pick out topographic features and build d3 helpers
-                var states = topojson.feature(usMapData, usMapData.objects.states);     // List of state outlines to fill
-                var statesMesh = topojson.mesh(usMapData, usMapData.objects.states);    // 'Mesh' of all outlines put together for a stroke
-                var projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
-                var path = d3.geoPath().projection(projection);
-                
-                // create array to store number of fast food restaurants in each state for colorScale
-                var countArr = [];
-                let max = 0;
-                // assign number of fast food restaurants to state feature property
-                for (let i = 0; i < states.features.length; i++) {
-                    let state = states.features[i];
-                    for (let j = 0; j <= 49; j++) {
-                        let element = fastFoodData[j];
-                        if (state.id == element['state_code']) {
-                            states.features[i].properties.numberOfRestaurant = parseInt(element['count']);
-                            countArr.push(parseInt(element['count']));
-                            if (parseInt(element['count']) > max) {
-                                max = parseInt(element['count']);
-                            }
-                            break;
-                        }
-                    }
-                }
-                    
-                // create color scale
-                var colorArr = ["#f4f4f4", "#fcd6d6", "#f9aeae", "#f68585", "#f35c5c", "#f03333", "#e71111", "#be0e0e", "#950b0b", "#6d0808"];
-                var colorScale = d3.scaleQuantile().domain(countArr).range(colorArr);
-
-                // draw states and fill color by using color scale
-                map.selectAll("path.state").data(states.features)
-                .join("path")
-                .attr("class", "state")
-                .attr("d", path)
-                .style("stroke", "#fff")
-                .style("stroke-width", "1")
-                .style("fill", d => colorScale(d.properties.numberOfRestaurant))
-                .on("click", mouseClickEvent); // give each polygon a click-on event to open or close plots on the right side
-                
-                // draw borders of each state
-                map.append("path").datum(statesMesh)
-                .attr("class","outline")
-                .attr("d", path);
-                
-                // on click event
-                // can refer to 10/13 class note
-                function mouseClickEvent() {
-                    // if plots are shown, call closePlot
-
-                    // otherwise, set plot visibility to visible
-                }
-
-                function closePlot() {
-                    // set plot visibility to hidden
-                }
-                
+	<head>
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="https://d3js.org/topojson.v3.min.js"></script>
+		<style>
+			.map {
+				margin: 0;
+			}
+			.state {
+				fill: lightgrey;
+			}
+			.outline {
+				stroke: lightgray;
+				stroke-width: 0.9px;
+				fill: none;
+			}
+            path:hover {
+                fill-opacity: 0.6;
             }
-            requestData();
+			.button {
+				width: fit-content;
+				padding: 10px;
+				margin: 0px 200px 20px 200px;
+				border: 1px solid grey;
+				border-radius: 15px;
+				background-color: #fcaf58;
+				border: 2px solid black;
+				box-shadow: 5px 5px gray;
+			}
+			.button:hover {
+				background-color: #f59c38;
+			}
+            .button:active{
+                background-color: #f57438;
+            }
+			.graph {
+				display: flex;
+			}
+			.title {
+				margin-left: 150px;
+			}
+            #colorLegend{
+                margin: 20px;
+            }
+		</style>
+	</head>
+	<body>
+		<h1>Project 2</h1>
+		<h2>Team Member: Zhan Wu, Yingshi Zhu, Qi Su, Minwei Jiang</h2>
 
-        }
-        requestFastFoodData();
+		<!-- div for map -->
 
-        
-        
-    </script>
-    </p>
-</body>
+		<div id="graph">
+			<h3 class="title">Fastfood Restuarants Geo-distribution in the US</h3>
+			<svg id="map" height="500" width="700" style="margin: 0px 20px"></svg>
+			<br />
+			<button class="button" onclick="showLocation()">Show Restuarant Location</button>
+			<br />
+            <!-- <div id="colorLegend"> </div>    -->
+			<svg id="colorLegend" height="100" width="600" style="margin-top: 30px"></svg>
+		</div>
+
+		<!-- div for plots -->
+		<div id="plot"></div>
+		<script>
+            // display restuarant location or not
+            let hide = true
+			// select map svg and do normal operations
+			const mapSvg = d3.select('#map');
+			const width = mapSvg.attr('width');
+			const height = mapSvg.attr('height');
+			const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+			const mapWidth = width - margin.left - margin.right;
+			const mapHeight = height - margin.top - margin.bottom;
+			const map = mapSvg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+            const tooltipWidth = 120;
+            const tooltipHeight = 40;
+
+			const requestFastFoodData = async function () {
+				// load fast food restaurant data
+				const fastFoodData = await d3.csv('./data/count_with_code.csv');
+				const restuarantLocation = await d3.csv('./data/Fast_Food_Restaurants_US.csv');
+
+				// load map data
+				const usMapData = await d3.json('./data/us-smaller.json');
+				console.log("fastFoodData",fastFoodData);
+
+				// Pick out topographic features and build d3 helpers
+				var states = topojson.feature(usMapData, usMapData.objects.states); // List of state outlines to fill
+				var statesMesh = topojson.mesh(usMapData, usMapData.objects.states); // 'Mesh' of all outlines put together for a stroke
+				var projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
+				var path = d3.geoPath().projection(projection);
+
+				// create array to store number of fast food restaurants in each state for colorScale
+				var countArr = [];
+                var stateIdCount = {}
+                var stateIdName = {}
+	
+				// assign number of fast food restaurants to state feature property
+				for (let i = 0; i < states.features.length; i++) {
+					let state = states.features[i];
+					for (let j = 0; j <= 49; j++) {
+						let element = fastFoodData[j];
+						if (state.id == element['state_code']) {
+							numberOfRestaurant = parseInt(element['count']);
+							states.features[i].properties.numberOfRestaurant = numberOfRestaurant;
+							countArr.push(numberOfRestaurant);
+                            stateIdCount[state.id] = numberOfRestaurant
+                            stateIdName[state.id] = element['state_short']
+							break;
+						}
+					}
+				}
+
+				// create color scale
+				var colorArr = ['#f9aeae', '#f35c5c', '#be0e0e', '#950b0b', '#6d0808'];
+				// var colorArr = ["#fcd6d6", "#f9aeae", "#f68585", "#f35c5c", "#f03333", "#e71111", "#be0e0e", "#950b0b", "#6d0808"];
+				var colorScale = d3.scaleQuantile().domain(countArr).range(colorArr);
+                const sortedCount = countArr.sort(function(a, b){return a-b})
+                // sort the count from smallest to largest
+				drawLegend(sortedCount,d3.select('#colorLegend'), colorScale);
+
+				// draw states and fill color using color scale
+				map
+					.selectAll('path.state')
+					.data(states.features)
+					.join('path')
+					.attr('class', 'state')
+					.attr('d', path)
+					.style('stroke', '#fff')
+					.style('stroke-width', '1')
+					.style('fill', (d) => colorScale(d.properties.numberOfRestaurant))
+                    .on('mouseover', mouseHoverEvent )
+                    .on('mouseout', clearMouseHover )
+					.on('click', mouseClickEvent); // give each polygon a click-on event to open or close plots on the right side
+
+				// draw borders of each state
+				map.append('path').datum(statesMesh).attr('class', 'outline').attr('d', path);
+
+				// plot a dot for each restuarant location
+                restuarantLocation.forEach((d) => {
+					d.Position = projection([d.longitude, d.latitude]);
+				});
+				circles = map
+					.selectAll('circle')
+					.data(restuarantLocation)
+					.join('circle')
+					.attr('r', 2)
+					.attr('fill', '#fcaf58')
+					.attr('opacity', 0)
+					.attr('cx', (d) => d.Position[0])
+					.attr('cy', (d) => d.Position[1]);
+                
+                // tooltip includes state name and restuarant number
+                let momesh =  map.append("path")
+                     .attr("class","mouseover outline")
+                     .attr("d", "");
+
+                let tooltip = map.append("g")
+                    .attr("class","tooltip")
+                    .attr("visibility","hidden");
+
+                tooltip.append("rect")
+                    .attr("fill", "grey")
+                    .attr("opacity", 0.8)
+                    .attr("x", -tooltipWidth / 2.0)
+                    .attr("y", 0)
+                    .attr("width",tooltipWidth)
+                    .attr("height",tooltipHeight)
+
+                let txt = tooltip.append("text")
+                                .attr("fill", "white")
+                                .attr("text-anchor","middle")
+                                .attr("alignment-baseline","hanging")
+                                .attr("x", 0)
+                                .attr("y", 2);
+                let txt2 = tooltip.append("text")
+                                .attr("fill", "white")
+                                .attr("text-anchor","middle")
+                                .attr("alignment-baseline","hanging")
+                                .attr("x", 0)
+                                .attr("y", 22);
+                
+                d3.selectAll(".state").on("mouseenter", mouseHoverEvent);
+                d3.selectAll(".state").on("mouseout",  clearMouseHover);
+
+                function mouseHoverEvent(){
+                    // show tooltip of fast food restuarant number
+                    tooltip.style("visibility","visible")
+                    let state = d3.select(this);
+                    let stateID = state.datum().id;
+                    
+                    txt.text(stateIdName[ stateID ]);
+                    txt2.text(stateIdCount[  stateID  ]);
+
+                    let bounds = path.bounds( state.datum() ); 
+                    // Place it at the bottom of the state, centered
+                    let xPos = (bounds[0][0]+bounds[1][0])/2.0;
+                    let yPos = bounds[1][1] - 15;
+                    tooltip.attr("transform",`translate(${xPos},${yPos})`);
+                    var mo = topojson.mesh(usMapData, usMapData.objects.states, function(a, b) { return a.id === stateID || b.id === stateID; });
+                    //  Then apply it to your special mesh that's on top of everything else
+                    momesh.datum(mo).attr("d", path)
+                
+                }
+
+                function clearMouseHover(){
+                    // set tooltip visibility to hidden
+                    tooltip.style("visibility","hidden");
+                    let state = d3.select(this);
+                    // hiding the mouseover mesh we added at the end of the lecture
+                    momesh.attr("d", "");
+                }
+
+
+                // click a state, show two plots based on data in that state on the right side
+				function mouseClickEvent() {
+					// if plots are shown, call closePlot
+					// otherwise, set plot visibility to visible
+                    // TODO
+
+				}
+
+				function closePlot() {
+                    //TODO
+
+
+					
+				}
+
+			};
+			requestFastFoodData();
+		</script>
+		<script>
+            // hide and show of the fastfood location
+            function showLocation(){
+                hide = !hide 
+                if (!hide){
+                    circles
+                    .style('opacity','0.3')
+                }
+                else{
+                    circles
+                    .style('opacity','0')
+                }
+       
+            }
+			function drawLegend(countArr, legend, legendColorScale) {
+				// draw legend using canvas
+                // const legendWidth = 600
+                // const legendHeight = 30
+                // const canvas = legend.append("canvas").attr("width", legendWidth).attr("height", legendHeight);
+                // const context = canvas.node().getContext('2d');
+                // const legendMinMax = d3.extent(legendColorScale.domain());
+                // const barScale = d3
+				// 	.scaleLinear()
+				// 	.domain([legendMinMax[0] - 1, legendMinMax[1] + 1])
+				// 	.range([0, legendWidth - 40]);
+                // console.log(countArr)
+                // for (let i =0; i < countArr.length-1; i++) {
+                //     let start = barScale(countArr[i])
+                //     let end = barScale(countArr[i+1])
+                //     let width = end - start
+                //     context.fillStyle = legendColorScale(start)
+                //     context.fillRect(start,0,width,100)
+                // };
+
+				const legendWidth = legend.attr('width');
+				const legendHeight = legend.attr('height');
+				const legendMinMax = d3.extent(legendColorScale.domain());
+				const barHeight = 40;
+				const stepSize = 4; // warning, not using a canvas element so lots of rect tags will be created for low stepSize, causing issues with performance
+				// Extend the minmax by 1 in either direction to expose more features
+				const pixelScale = d3
+					.scaleLinear()
+					.domain([0, legendWidth - 40])
+					.range([legendMinMax[0] - 1, legendMinMax[1] + 1]); // In this case the "data" are pixels, and we get numbers to use in colorScale
+				const barScale = d3
+					.scaleLinear()
+					.domain([legendMinMax[0] - 1, legendMinMax[1] + 1])
+					.range([0, legendWidth - 40]);
+				const barAxis = d3.axisBottom(barScale);
+				// Check if we're using a quantile scale - if so, we can do better
+				if (legendColorScale.hasOwnProperty('quantiles')) {
+					// Use the quantile breakpoints plus the min and max of the scale as tick values
+					barAxis.tickValues(legendColorScale.quantiles().concat(legendMinMax));
+				}
+				legend
+					.append('g')
+					.attr('class', 'colorbar axis')
+					.attr('transform', 'translate(' + 20 + ',' + (barHeight + 5) + ')')
+					.call(barAxis);
+				// Draw rects of color down the bar
+				let bar = legend.append('g').attr('transform', 'translate(' + 20 + ',' + 0 + ')');
+				for (let i = 0; i < legendWidth - 40; i = i + stepSize) {
+					bar
+						.append('rect')
+						.attr('x', i)
+						.attr('y', 0)
+						.attr('width', stepSize)
+						.attr('height', barHeight)
+						.style('fill', legendColorScale(pixelScale(i))); // pixels => countData => color
+				}
+				// Put lines in to mark actual min and max of our data
+				bar
+					.append('line')
+					.attr('stroke', 'white')
+					.attr('stroke-width', 3)
+					.attr('x1', barScale(legendMinMax[0]))
+					.attr('x2', barScale(legendMinMax[0]))
+					.attr('y1', 0)
+					.attr('y1', barHeight + 4);
+				bar
+					.append('line')
+					.attr('stroke', 'white')
+					.attr('stroke-width', 3)
+					.attr('x1', barScale(legendMinMax[1]))
+					.attr('x2', barScale(legendMinMax[1]))
+					.attr('y1', 0)
+					.attr('y1', barHeight + 4);
+			}
+		</script>
+	</body>
 </html>
