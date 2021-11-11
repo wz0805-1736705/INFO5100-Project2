@@ -55,7 +55,7 @@
 			<h3 class="title">Fastfood Restuarants Geo-distribution in the US</h3>
 			<svg id="map" height="500" width="700" style="margin: 0px 20px"></svg>
 			<br />
-			<button class="button" onclick="showLocation()">Show Restuarant Location</button>
+			<button class="button" id="showCircle">Show Restuarant Location</button>
 			<br />
             <!-- <div id="colorLegend"> </div>    -->
 			<svg id="colorLegend" height="100" width="600" style="margin-top: 30px"></svg>
@@ -121,8 +121,15 @@
                 // sort the count from smallest to largest
 				drawLegend(sortedCount,d3.select('#colorLegend'), colorScale);
 
+				// plot a dot for each restuarant location
+                restuarantLocation.forEach((d) => {
+					d.Position = projection([d.longitude, d.latitude]);
+				});
+				var buttonClicked = 0;
+				d3.select('#showCircle').on('click', showLocation);
+				
 				// draw states and fill color using color scale
-				map
+				map.append('g')
 					.selectAll('path.state')
 					.data(states.features)
 					.join('path')
@@ -137,20 +144,6 @@
 
 				// draw borders of each state
 				map.append('path').datum(statesMesh).attr('class', 'outline').attr('d', path);
-
-				// plot a dot for each restuarant location
-                restuarantLocation.forEach((d) => {
-					d.Position = projection([d.longitude, d.latitude]);
-				});
-				circles = map
-					.selectAll('circle')
-					.data(restuarantLocation)
-					.join('circle')
-					.attr('r', 2)
-					.attr('fill', '#fcaf58')
-					.attr('opacity', 0)
-					.attr('cx', (d) => d.Position[0])
-					.attr('cy', (d) => d.Position[1]);
                 
                 // tooltip includes state name and restuarant number
                 let momesh =  map.append("path")
@@ -185,6 +178,28 @@
                 d3.selectAll(".state").on("mouseenter", mouseHoverEvent);
                 d3.selectAll(".state").on("mouseout",  clearMouseHover);
 
+
+				// hide and show of the fastfood location
+				function showLocation(){
+					if (buttonClicked === 0) {
+						var circles = map
+							.append('g')
+							.attr('id', 'circlesG')
+							.selectAll('circle')
+							.data(restuarantLocation)
+							.join('circle')
+							.attr('r', 2)
+							.attr('fill', '#80D668')
+							.attr('opacity', 0.3)
+							.attr('cx', (d) => d.Position[0])
+							.attr('cy', (d) => d.Position[1]);
+						buttonClicked = 1;
+					} else {
+						d3.select('#circlesG').remove();
+						buttonClicked = 0;
+					}
+				}
+
                 function mouseHoverEvent(){
                     // show tooltip of fast food restuarant number
                     tooltip.style("visibility","visible")
@@ -204,7 +219,7 @@
                     momesh.datum(mo).attr("d", path)
                 
                 }
-
+				
                 function clearMouseHover(){
                     // set tooltip visibility to hidden
                     tooltip.style("visibility","hidden");
@@ -233,21 +248,9 @@
 			requestFastFoodData();
 		</script>
 		<script>
-            // hide and show of the fastfood location
-            function showLocation(){
-                hide = !hide 
-                if (!hide){
-                    circles
-                    .style('opacity','0.3')
-                }
-                else{
-                    circles
-                    .style('opacity','0')
-                }
-       
-            }
+            
 			function drawLegend(countArr, legend, legendColorScale) {
-				// draw legend using canvas
+				// // draw legend using canvas
                 // const legendWidth = 600
                 // const legendHeight = 30
                 // const canvas = legend.append("canvas").attr("width", legendWidth).attr("height", legendHeight);
