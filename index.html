@@ -15,9 +15,9 @@
 				stroke-width: 0.9px;
 				fill: none;
 			}
-            path:hover {
-                fill-opacity: 0.6;
-            }
+			path:hover {
+				fill-opacity: 0.6;
+			}
 			.button {
 				width: fit-content;
 				padding: 10px;
@@ -31,18 +31,18 @@
 			.button:hover {
 				background-color: #f59c38;
 			}
-            .button:active{
-                background-color: #f57438;
-            }
+			.button:active {
+				background-color: #f57438;
+			}
 			.graph {
 				display: flex;
 			}
 			.title {
 				margin-left: 150px;
 			}
-            #colorLegend{
-                margin: 20px;
-            }
+			#colorLegend {
+				margin: 20px;
+			}
 		</style>
 	</head>
 	<body>
@@ -57,15 +57,15 @@
 			<br />
 			<button class="button" id="showCircle">Show Restuarant Location</button>
 			<br />
-            <!-- <div id="colorLegend"> </div>    -->
+			<!-- <div id="colorLegend"> </div>    -->
 			<svg id="colorLegend" height="100" width="600" style="margin-top: 30px"></svg>
 		</div>
 
 		<!-- div for plots -->
 		<div id="plot"></div>
 		<script>
-            // display restuarant location or not
-            let hide = true
+			// display restuarant location or not
+			let hide = true;
 			// select map svg and do normal operations
 			const mapSvg = d3.select('#map');
 			const width = mapSvg.attr('width');
@@ -74,8 +74,8 @@
 			const mapWidth = width - margin.left - margin.right;
 			const mapHeight = height - margin.top - margin.bottom;
 			const map = mapSvg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-            const tooltipWidth = 120;
-            const tooltipHeight = 40;
+			const tooltipWidth = 120;
+			const tooltipHeight = 40;
 
 			const requestFastFoodData = async function () {
 				// load fast food restaurant data
@@ -84,7 +84,7 @@
 
 				// load map data
 				const usMapData = await d3.json('./data/us-smaller.json');
-				console.log("fastFoodData",fastFoodData);
+				console.log('fastFoodData', fastFoodData);
 
 				// Pick out topographic features and build d3 helpers
 				var states = topojson.feature(usMapData, usMapData.objects.states); // List of state outlines to fill
@@ -94,9 +94,9 @@
 
 				// create array to store number of fast food restaurants in each state for colorScale
 				var countArr = [];
-                var stateIdCount = {}
-                var stateIdName = {}
-	
+				var stateIdCount = {};
+				var stateIdName = {};
+
 				// assign number of fast food restaurants to state feature property
 				for (let i = 0; i < states.features.length; i++) {
 					let state = states.features[i];
@@ -106,8 +106,8 @@
 							numberOfRestaurant = parseInt(element['count']);
 							states.features[i].properties.numberOfRestaurant = numberOfRestaurant;
 							countArr.push(numberOfRestaurant);
-                            stateIdCount[state.id] = numberOfRestaurant
-                            stateIdName[state.id] = element['state_short']
+							stateIdCount[state.id] = numberOfRestaurant;
+							stateIdName[state.id] = element['state_short'];
 							break;
 						}
 					}
@@ -117,19 +117,22 @@
 				var colorArr = ['#f9aeae', '#f35c5c', '#be0e0e', '#950b0b', '#6d0808'];
 				// var colorArr = ["#fcd6d6", "#f9aeae", "#f68585", "#f35c5c", "#f03333", "#e71111", "#be0e0e", "#950b0b", "#6d0808"];
 				var colorScale = d3.scaleQuantile().domain(countArr).range(colorArr);
-                const sortedCount = countArr.sort(function(a, b){return a-b})
-                // sort the count from smallest to largest
-				drawLegend(sortedCount,d3.select('#colorLegend'), colorScale);
+				const sortedCount = countArr.sort(function (a, b) {
+					return a - b;
+				});
+				// sort the count from smallest to largest
+				drawLegend(sortedCount, d3.select('#colorLegend'), colorScale);
 
 				// plot a dot for each restuarant location
-                restuarantLocation.forEach((d) => {
+				restuarantLocation.forEach((d) => {
 					d.Position = projection([d.longitude, d.latitude]);
 				});
 				var buttonClicked = 0;
 				d3.select('#showCircle').on('click', showLocation);
-				
+
 				// draw states and fill color using color scale
-				map.append('g')
+				map
+					.append('g')
 					.selectAll('path.state')
 					.data(states.features)
 					.join('path')
@@ -138,49 +141,35 @@
 					.style('stroke', '#fff')
 					.style('stroke-width', '1')
 					.style('fill', (d) => colorScale(d.properties.numberOfRestaurant))
-                    .on('mouseover', mouseHoverEvent )
-                    .on('mouseout', clearMouseHover )
+					.on('mouseover', mouseHoverEvent)
+					.on('mouseout', clearMouseHover)
 					.on('click', mouseClickEvent); // give each polygon a click-on event to open or close plots on the right side
 
 				// draw borders of each state
 				map.append('path').datum(statesMesh).attr('class', 'outline').attr('d', path);
-                
-                // tooltip includes state name and restuarant number
-                let momesh =  map.append("path")
-                     .attr("class","mouseover outline")
-                     .attr("d", "");
 
-                let tooltip = map.append("g")
-                    .attr("class","tooltip")
-                    .attr("visibility","hidden");
+				// tooltip includes state name and restuarant number
+				let momesh = map.append('path').attr('class', 'mouseover outline').attr('d', '');
 
-                tooltip.append("rect")
-                    .attr("fill", "grey")
-                    .attr("opacity", 0.8)
-                    .attr("x", -tooltipWidth / 2.0)
-                    .attr("y", 0)
-                    .attr("width",tooltipWidth)
-                    .attr("height",tooltipHeight)
+				let tooltip = map.append('g').attr('class', 'tooltip').attr('visibility', 'hidden');
 
-                let txt = tooltip.append("text")
-                                .attr("fill", "white")
-                                .attr("text-anchor","middle")
-                                .attr("alignment-baseline","hanging")
-                                .attr("x", 0)
-                                .attr("y", 2);
-                let txt2 = tooltip.append("text")
-                                .attr("fill", "white")
-                                .attr("text-anchor","middle")
-                                .attr("alignment-baseline","hanging")
-                                .attr("x", 0)
-                                .attr("y", 22);
-                
-                d3.selectAll(".state").on("mouseenter", mouseHoverEvent);
-                d3.selectAll(".state").on("mouseout",  clearMouseHover);
+				tooltip
+					.append('rect')
+					.attr('fill', 'grey')
+					.attr('opacity', 0.8)
+					.attr('x', -tooltipWidth / 2.0)
+					.attr('y', 0)
+					.attr('width', tooltipWidth)
+					.attr('height', tooltipHeight);
 
+				let txt = tooltip.append('text').attr('fill', 'white').attr('text-anchor', 'middle').attr('alignment-baseline', 'hanging').attr('x', 0).attr('y', 2);
+				let txt2 = tooltip.append('text').attr('fill', 'white').attr('text-anchor', 'middle').attr('alignment-baseline', 'hanging').attr('x', 0).attr('y', 22);
+
+				d3.selectAll('.state').on('mouseenter', ()=> {d3.select(this).raise(); mouseHoverEvent());
+				d3.selectAll('.state').on('mouseout', clearMouseHover);
 
 				// hide and show of the fastfood location
-				function showLocation(){
+				function showLocation() {
 					if (buttonClicked === 0) {
 						var circles = map
 							.append('g')
@@ -189,8 +178,8 @@
 							.data(restuarantLocation)
 							.join('circle')
 							.attr('r', 2)
-							.attr('fill', '#80D668')
-							.attr('opacity', 0.3)
+							.attr('fill', '#cf6e00')
+							.attr('opacity', 0.4)
 							.attr('cx', (d) => d.Position[0])
 							.attr('cy', (d) => d.Position[1]);
 						buttonClicked = 1;
@@ -200,74 +189,69 @@
 					}
 				}
 
-                function mouseHoverEvent(){
-                    // show tooltip of fast food restuarant number
-                    tooltip.style("visibility","visible")
-                    let state = d3.select(this);
-                    let stateID = state.datum().id;
-                    
-                    txt.text(stateIdName[ stateID ]);
-                    txt2.text(stateIdCount[  stateID  ]);
-
-                    let bounds = path.bounds( state.datum() ); 
-                    // Place it at the bottom of the state, centered
-                    let xPos = (bounds[0][0]+bounds[1][0])/2.0;
-                    let yPos = bounds[1][1] - 15;
-                    tooltip.attr("transform",`translate(${xPos},${yPos})`);
-                    var mo = topojson.mesh(usMapData, usMapData.objects.states, function(a, b) { return a.id === stateID || b.id === stateID; });
-                    //  Then apply it to your special mesh that's on top of everything else
-                    momesh.datum(mo).attr("d", path)
-                
-                }
+				function mouseHoverEvent() {
+					// show tooltip of fast food restuarant number
+					tooltip.style('visibility', 'visible');
+					let state = d3.select(this);
 				
-                function clearMouseHover(){
-                    // set tooltip visibility to hidden
-                    tooltip.style("visibility","hidden");
-                    let state = d3.select(this);
-                    // hiding the mouseover mesh we added at the end of the lecture
-                    momesh.attr("d", "");
-                }
+					let stateID = state.datum().id;
 
+					txt.text(stateIdName[stateID]);
+					txt2.text(stateIdCount[stateID]);
 
-                // click a state, show two plots based on data in that state on the right side
+					let bounds = path.bounds(state.datum());
+					// Place it at the bottom of the state, centered
+					let xPos = (bounds[0][0] + bounds[1][0]) / 2.0;
+					let yPos = bounds[1][1] - 15;
+					tooltip.attr('transform', `translate(${xPos},${yPos})`);
+					var mo = topojson.mesh(usMapData, usMapData.objects.states, function (a, b) {
+						return a.id === stateID || b.id === stateID;
+					});
+					//  Then apply it to your special mesh that's on top of everything else
+					momesh.datum(mo).attr('d', path);
+				}
+
+				function clearMouseHover() {
+					// set tooltip visibility to hidden
+					tooltip.style('visibility', 'hidden');
+					let state = d3.select(this);
+					// hiding the mouseover mesh we added at the end of the lecture
+					momesh.attr('d', '');
+				}
+
+				// click a state, show two plots based on data in that state on the right side
 				function mouseClickEvent() {
 					// if plots are shown, call closePlot
 					// otherwise, set plot visibility to visible
-                    // TODO
-
+					// TODO
 				}
 
 				function closePlot() {
-                    //TODO
-
-
-					
+					//TODO
 				}
-
 			};
 			requestFastFoodData();
 		</script>
 		<script>
-            
 			function drawLegend(countArr, legend, legendColorScale) {
 				// // draw legend using canvas
-                // const legendWidth = 600
-                // const legendHeight = 30
-                // const canvas = legend.append("canvas").attr("width", legendWidth).attr("height", legendHeight);
-                // const context = canvas.node().getContext('2d');
-                // const legendMinMax = d3.extent(legendColorScale.domain());
-                // const barScale = d3
+				// const legendWidth = 600
+				// const legendHeight = 30
+				// const canvas = legend.append("canvas").attr("width", legendWidth).attr("height", legendHeight);
+				// const context = canvas.node().getContext('2d');
+				// const legendMinMax = d3.extent(legendColorScale.domain());
+				// const barScale = d3
 				// 	.scaleLinear()
 				// 	.domain([legendMinMax[0] - 1, legendMinMax[1] + 1])
 				// 	.range([0, legendWidth - 40]);
-                // console.log(countArr)
-                // for (let i =0; i < countArr.length-1; i++) {
-                //     let start = barScale(countArr[i])
-                //     let end = barScale(countArr[i+1])
-                //     let width = end - start
-                //     context.fillStyle = legendColorScale(start)
-                //     context.fillRect(start,0,width,100)
-                // };
+				// console.log(countArr)
+				// for (let i =0; i < countArr.length-1; i++) {
+				//     let start = barScale(countArr[i])
+				//     let end = barScale(countArr[i+1])
+				//     let width = end - start
+				//     context.fillStyle = legendColorScale(start)
+				//     context.fillRect(start,0,width,100)
+				// };
 
 				const legendWidth = legend.attr('width');
 				const legendHeight = legend.attr('height');
