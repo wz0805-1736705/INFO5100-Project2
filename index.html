@@ -113,7 +113,6 @@
 
 				// create color scale
 				var colorArr = ['#f9aeae', '#f35c5c', '#be0e0e', '#950b0b', '#6d0808'];
-				// var colorArr = ["#fcd6d6", "#f9aeae", "#f68585", "#f35c5c", "#f03333", "#e71111", "#be0e0e", "#950b0b", "#6d0808"];
 				var colorScale = d3.scaleQuantile().domain(countArr).range(colorArr);
 				const sortedCount = countArr.sort(function (a, b) {
 					return a - b;
@@ -262,19 +261,23 @@
 				const legendHeight = legend.attr('height');
 				const legendMinMax = d3.extent(legendColorScale.domain());
 				const barHeight = 40;
-				const stepSize = 4; // warning, not using a canvas element so lots of rect tags will be created for low stepSize, causing issues with performance
+				const stepSize = 4;
+
 				// Extend the minmax by 1 in either direction to expose more features
+				// create pixel and bar scale
 				const pixelScale = d3
 					.scaleLinear()
 					.domain([0, legendWidth - 40])
-					.range([legendMinMax[0] - 1, legendMinMax[1] + 1]); // In this case the "data" are pixels, and we get numbers to use in colorScale
+					.range([legendMinMax[0] - 1, legendMinMax[1] + 1]);
 				const barScale = d3
 					.scaleLinear()
 					.domain([legendMinMax[0] - 1, legendMinMax[1] + 1])
 					.range([0, legendWidth - 40]);
 				const barAxis = d3.axisBottom(barScale);
-				// Check if we're using a quantile scale - if so, we can do better
+
+				// Check if we're using a quantile scale
 				if (legendColorScale.hasOwnProperty('quantiles')) {
+
 					// Use the quantile breakpoints plus the min and max of the scale as tick values
 					barAxis.tickValues(legendColorScale.quantiles().concat(legendMinMax));
 				}
@@ -283,6 +286,7 @@
 					.attr('class', 'colorbar axis')
 					.attr('transform', 'translate(' + 20 + ',' + (barHeight + 5) + ')')
 					.call(barAxis);
+
 				// Draw rects of color down the bar
 				let bar = legend.append('g').attr('transform', 'translate(' + 20 + ',' + 0 + ')');
 				for (let i = 0; i < legendWidth - 40; i = i + stepSize) {
