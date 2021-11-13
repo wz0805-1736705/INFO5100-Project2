@@ -15,9 +15,9 @@
 				stroke-width: 0.9px;
 				fill: none;
 			}
-			path:hover {
+			/* path:hover {
 				fill-opacity: 0.6;
-			}
+			} */
 			.button {
 				width: fit-content;
 				padding: 10px;
@@ -64,8 +64,6 @@
 		<!-- div for plots -->
 		<div id="plot"></div>
 		<script>
-			// display restuarant location or not
-			let hide = true;
 			// select map svg and do normal operations
 			const mapSvg = d3.select('#map');
 			const width = mapSvg.attr('width');
@@ -127,7 +125,7 @@
 				restuarantLocation.forEach((d) => {
 					d.Position = projection([d.longitude, d.latitude]);
 				});
-				var buttonClicked = 0;
+				var showDots = false;
 				d3.select('#showCircle').on('click', showLocation);
 
 				// draw states and fill color using color scale
@@ -141,7 +139,7 @@
 					.style('stroke', '#fff')
 					.style('stroke-width', '1')
 					.style('fill', (d) => colorScale(d.properties.numberOfRestaurant))
-					.on('mouseover', mouseHoverEvent)
+					.on('mouseenter', mouseHoverEvent)
 					.on('mouseout', clearMouseHover)
 					.on('click', mouseClickEvent); // give each polygon a click-on event to open or close plots on the right side
 
@@ -165,12 +163,10 @@
 				let txt = tooltip.append('text').attr('fill', 'white').attr('text-anchor', 'middle').attr('alignment-baseline', 'hanging').attr('x', 0).attr('y', 2);
 				let txt2 = tooltip.append('text').attr('fill', 'white').attr('text-anchor', 'middle').attr('alignment-baseline', 'hanging').attr('x', 0).attr('y', 22);
 
-				d3.selectAll('.state').on('mouseenter', ()=> {d3.select(this).raise(); mouseHoverEvent());
-				d3.selectAll('.state').on('mouseout', clearMouseHover);
 
 				// hide and show of the fastfood location
 				function showLocation() {
-					if (buttonClicked === 0) {
+					if (showDots === false) {
 						var circles = map
 							.append('g')
 							.attr('id', 'circlesG')
@@ -178,20 +174,24 @@
 							.data(restuarantLocation)
 							.join('circle')
 							.attr('r', 2)
-							.attr('fill', '#cf6e00')
+							.attr('fill', '#e38010')
 							.attr('opacity', 0.4)
 							.attr('cx', (d) => d.Position[0])
 							.attr('cy', (d) => d.Position[1]);
-						buttonClicked = 1;
+						showDots = true;
+						// change button text
+						d3.select('button').text('Hide Restuarant Location')
 					} else {
 						d3.select('#circlesG').remove();
-						buttonClicked = 0;
+						showDots = false;
+						d3.select('button').text('Show Restuarant Location')
 					}
 				}
 
 				function mouseHoverEvent() {
 					// show tooltip of fast food restuarant number
-					tooltip.style('visibility', 'visible');
+					if (!showDots){
+					tooltip.style('visibility', 'visible').raise();
 					let state = d3.select(this);
 				
 					let stateID = state.datum().id;
@@ -208,16 +208,21 @@
 						return a.id === stateID || b.id === stateID;
 					});
 					//  Then apply it to your special mesh that's on top of everything else
-					momesh.datum(mo).attr('d', path);
+					momesh.datum(mo).attr('d', path).style("stroke", "black").style('stroke-width','2');
+					state.style('opacity',0.6)
 				}
+			}
 
 				function clearMouseHover() {
+					if (!showDots){
 					// set tooltip visibility to hidden
 					tooltip.style('visibility', 'hidden');
 					let state = d3.select(this);
 					// hiding the mouseover mesh we added at the end of the lecture
 					momesh.attr('d', '');
+					state.style('opacity',1)
 				}
+			}
 
 				// click a state, show two plots based on data in that state on the right side
 				function mouseClickEvent() {
