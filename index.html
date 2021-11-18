@@ -128,43 +128,7 @@
 			let luma = Math.min(130, hclColor.l + 30);
 			return d3.rgb(d3.hcl(hclColor.h, hclColor.c, luma));
 		}
-		function onStateMouseOver(data) {
-			svg2.select(`#${data}`)
-				.transition().duration(200)
-				.attr("r", 7)
-				.attr("stroke-width", 2)
-				.attr("stroke", "black")
-				.style("fill", lighten('rgb(24, 161, 205)'));
-
-
-			svg3.select(`#${data}_pop`)
-				.transition().duration(200)
-				.attr("r", 7)
-				.style("fill", lighten('rgb(192, 45, 36)'));
-
-
-			svg3.select(`#${data}_stick`)
-				.transition().duration(200)
-				.attr("stroke-width", 2);
-
-		}
-		function onStateMouseOut(data) {
-			svg2.select(`#${data}`)
-				.transition().duration(200)
-				.attr("r", 5)
-				.attr("stroke-width", 0)
-				.style("fill", 'rgb(24, 161, 205)');
-
-			svg3.select(`#${data}_pop`)
-				.transition().duration(200)
-				.attr("r", 5)
-				.style("fill", 'rgb(192, 45, 36)');
-
-
-			svg3.select(`#${data}_stick`)
-				.transition().duration(200)
-				.attr("stroke-width", 1);
-		}
+		
 	</script>
 
 	<script>
@@ -313,8 +277,23 @@
 					//  Then apply it to your special mesh that's on top of everything else
 					momesh.datum(mo).attr('d', path).style("stroke", "black").style('stroke-width', '2');
 					state.style('opacity', 0.6)
+					
+					data = stateIdName[state.datum().id]
+					svg2.select(`#${data}`)
+				.attr("r", 7)
+				.attr("stroke-width", 2)
+				.attr("stroke", "black")
+				.style("fill", lighten('rgb(24, 161, 205)'));
 
-					onStateMouseOver(stateIdName[state.datum().id])
+
+			svg3.select(`#${data}_pop`)
+				.attr("r", 7)
+				.style("fill", lighten('rgb(192, 45, 36)'));
+
+
+			svg3.select(`#${data}_stick`)
+				.attr("stroke-width", 2);
+					
 				}
 			}
 
@@ -327,7 +306,20 @@
 					momesh.attr('d', '');
 					state.style('opacity', 1)
 
-					onStateMouseOut(stateIdName[state.datum().id])
+
+					data =stateIdName[state.datum().id]	
+					svg2.select(`#${data}`)
+				.attr("r", 5)
+				.attr("stroke-width", 0)
+				.style("fill", 'rgb(24, 161, 205)');
+
+			svg3.select(`#${data}_pop`)
+				.attr("r", 5)
+				.style("fill", 'rgb(192, 45, 36)');
+
+
+			svg3.select(`#${data}_stick`)
+				.attr("stroke-width", 1);
 				}
 			}
 
