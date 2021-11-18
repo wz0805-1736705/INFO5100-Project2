@@ -116,7 +116,7 @@
 		</div>
 		<div id="moreGraph" class="graph-item">
 			<h3 id="cancerRate" class="title">Cancer rate</h3>
-			<svg id="circleChart" height="400" width="700" style="margin: 0px 20px"></svg>
+			<svg id="circleChart" height="400" width="900" style="margin: 0px 20px"></svg>
 
 
 			<h3 id="obesity" class="title">Obesity</h3>
@@ -288,11 +288,11 @@
 						.attr('cy', (d) => d.Position[1]);
 					showDots = true;
 					// change button text
-					d3.select('button').text('Hide Restuarant Location')
+					d3.select('button').text('Hide Restaurant Location')
 				} else {
 					d3.select('#circlesG').remove();
 					showDots = false;
-					d3.select('button').text('Show Restuarant Location')
+					d3.select('button').text('Show Restaurant Location')
 				}
 			}
 
@@ -487,14 +487,14 @@
 
 			annotations.append("g")
 				.append("text")
-				.text("caseCount")
+				.text("Case Count")
 				.attr("transform", "rotate(-90) translate(" + -(chartHeight / 2) + "," + 20 + ")")
 				.attr("text-anchor", "end")
 
 			annotations.append("g")
 				.append("text")
 				.attr("transform", "translate(" + (width / 2) + "," + (chartHeight + margin.bottom) + ")")
-				.text("rate (caseCount per 100,000 people)")
+				.text("Rate (Case Count per 100,000 people)")
 				.attr("text-anchor", "middle")
 
 			let bottomAxis = d3.axisBottom(xAxisScale)
@@ -503,7 +503,7 @@
 				.tickFormat("")
 			annotations.append("g")
 				.attr("class", "x axis")
-				.attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top) + ")")
+				.attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top + 10) + ")")
 				.call(bottomAxis);
 			annotations.append("g")
 				.attr("class", "x gridlines")
