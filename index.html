@@ -19,9 +19,6 @@
 			fill: none;
 		}
 
-		/* path:hover {
-				fill-opacity: 0.6;
-			} */
 		.button {
 			width: fit-content;
 			padding: 10px;
@@ -48,10 +45,6 @@
 		.graph-item {
 			display: flex;
 			flex-direction: column;
-		}
-
-		.title {
-			margin-left: 150px;
 		}
 
 		#colorLegend {
@@ -105,22 +98,24 @@
 	<!-- div for map -->
 
 	<div id="graph">
-		<div class="graph-item">
+		<div class="graph-item" style="text-align: center;">
+		
 			<h3 class="title">Fastfood Restuarants Geo-distribution in the US</h3>
-			<svg id="map" height="500" width="500" style="margin: 0px 20px"></svg>
+			<svg id="map" height="450" width="700" style="margin: 0px 20px"></svg>
 			<br />
-			<button class="button" id="showCircle">Show Restuarant Location</button>
+			<div ><button class="button" id="showCircle">Show Restuarant Location</button></div>
 			<br />
 			<!-- <div id="colorLegend"> </div>    -->
-			<svg id="colorLegend" height="100" width="600" style="margin-top: 30px"></svg>
+			<div><svg id="colorLegend" height="80" width="500" style="margin-top: 30px"></svg></div>
+	
 		</div>
 		<div id="moreGraph" class="graph-item">
 			<h3 id="cancerRate" class="title">Cancer rate</h3>
-			<svg id="circleChart" height="350" width="700" style="margin: 0px 20px"></svg>
+			<svg id="circleChart" height="300" width="600" style="margin: 0px 20px"></svg>
 
 
 			<h3 id="obesity" class="title">Obesity</h3>
-			<svg id="CIChart" height="350" width="700" style="margin: 0px 20px"></svg>
+			<svg id="CIChart" height="300" width="600" style="margin: 0px 20px"></svg>
 		</div>
 	</div>
 
