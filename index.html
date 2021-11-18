@@ -107,7 +107,7 @@
 	<div id="graph">
 		<div class="graph-item">
 			<h3 class="title">Fastfood Restuarants Geo-distribution in the US</h3>
-			<svg id="map" height="500" width="700" style="margin: 0px 20px"></svg>
+			<svg id="map" height="500" width="500" style="margin: 0px 20px"></svg>
 			<br />
 			<button class="button" id="showCircle">Show Restuarant Location</button>
 			<br />
@@ -116,11 +116,11 @@
 		</div>
 		<div id="moreGraph" class="graph-item">
 			<h3 id="cancerRate" class="title">Cancer rate</h3>
-			<svg id="circleChart" height="400" width="900" style="margin: 0px 20px"></svg>
+			<svg id="circleChart" height="350" width="700" style="margin: 0px 20px"></svg>
 
 
 			<h3 id="obesity" class="title">Obesity</h3>
-			<svg id="CIChart" height="400" width="900" style="margin: 0px 20px"></svg>
+			<svg id="CIChart" height="350" width="700" style="margin: 0px 20px"></svg>
 		</div>
 	</div>
 
@@ -674,7 +674,7 @@
 
 			annotations.append("g")
 				.append("text")
-				.attr("transform", "translate(" + (width / 2) + "," + (chartHeight + margin.bottom) + ")")
+				.attr("transform", "translate(" + (width / 2) + "," + (chartHeight + margin.bottom - 15) + ")")
 				.text("State")
 				.attr("text-anchor", "middle")
 
