@@ -426,6 +426,7 @@
 	</script>
 
 	<script>
+		// plot cancer 
 		const svg2 = d3.select("#circleChart");
 		const requestData = async function () {
 			const data = await d3.csv("./data/csvData.csv");
@@ -507,7 +508,7 @@
 				'female': 'rgb(192, 45, 36)',
 				'mixed': 'rgb(184, 77, 190)'
 			};
-
+			// plot circles
 			let circles = chartArea.selectAll("circle").data(data)
 				.join("circle")
 				.attr("id", d => d['state_short'])
@@ -521,7 +522,7 @@
 			const tooltip = d3.select("body").append("div")
 				.attr("id", "tooltip")
 				.attr("opacity", 0);
-
+			// mouse on
 			circles.on("mouseover", function (e) {
 
 				d3.select(this)
@@ -533,7 +534,7 @@
 
 				let hoverData = d3.select(this).datum()
 
-				const x = e.pageX + 10;
+				const x = e.pageX -200;
 				const y = e.pageY + 15;
 				tooltip.style("display", 'none');
 				tooltip.html(`<p class="title">${hoverData['State']}</p>
@@ -581,6 +582,7 @@
 	</script>
 
 	<script>
+		// plot obesity
 		const svg3 = d3.select("#CIChart");
 		const requestOverallData = async function () {
 			const data = await d3.csv("./data/2020-overall.csv");
@@ -702,7 +704,7 @@
 
 				let hoverData = d3.select(this).datum()
 
-				const x = e.pageX + 10;
+				const x = e.pageX - 160;
 				const y = e.pageY + 15;
 				tooltip.style("display", 'none');
 				tooltip.html(`<p class="title">${hoverData['State']}</p>
