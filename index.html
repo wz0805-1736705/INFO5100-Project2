@@ -300,7 +300,7 @@
 			function clearMouseHover() {
 				if (!showDots) {
 					// set tooltip visibility to hidden
-					tooltip.style('visibility', 'hidden');
+					tooltip.style('visibility', 'hidden').lower();
 					let state = d3.select(this);
 					// hiding the mouseover mesh we added at the end of the lecture
 					momesh.attr('d', '');
